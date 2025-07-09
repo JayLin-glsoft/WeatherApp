@@ -1,8 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MaterialIcons } from '@expo/vector-icons';
 import SearchScreen from '../screens/SearchScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 
@@ -23,33 +22,49 @@ export default function AppNavigator() {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" />
             <NavigationContainer>
-                <Stack.Navigator
-                    id={undefined}
-                    initialRouteName="Search"
-                    screenOptions={{
-                        headerStyle: { backgroundColor: '#1e90ff' },
-                        headerTintColor: '#fff',
-                        headerTitleStyle: { fontWeight: 'bold' },
-                    }}
-                >
-                    <Stack.Screen
-                        name="Search"
-                        component={SearchScreen}
-                    />
-                    <Stack.Screen
-                        name="History"
-                        component={HistoryScreen}
-                        options={{ title: '查詢歷史' }}
-                    />
-                </Stack.Navigator>
-            </NavigationContainer>
+            <Stack.Navigator
+                id={undefined}
+                screenOptions={{
+                    headerStyle: { backgroundColor: '#007cdb' },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: { fontWeight: 'bold', color: '#fff' },
+                    ...Platform.select({
+                        ios: {
+                            headerTitleAlign: 'center',
+                        },
+                        android: {
+                            headerTitleAlign: 'left',
+                        },
+                    }),
+
+                }}
+            >
+                <Stack.Screen
+                    name="Search"
+                    component={SearchScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="History"
+                    component={HistoryScreen}
+                    options={{ title: '查詢歷史', headerBackTitle: null }}
+                />
+            </Stack.Navigator>
+        </NavigationContainer>
         </SafeAreaView>
+
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1e90ff',
+        backgroundColor: '#007cdb',
+        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+    },
+    historyContainer: {
+        backgroundColor: 'red', // 給一個鮮紅的背景色
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

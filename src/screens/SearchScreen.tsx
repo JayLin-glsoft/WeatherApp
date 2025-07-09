@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { fetchWeather, saveHistory } from '../redux/weatherSlice';
 import { SearchScreenProps } from '../navigation/AppNavigator';
 import { useAppDispatch } from '../redux/hooks'; // 使用型別安全的 hook
 import { RootState } from '../redux/store';
-import { MaterialIcons } from '@expo/vector-icons';
+import HeaderInfo from '../components/HeaderInfo';
+import CurrentWeather from '../components/CurrentWeather';
+import HourlyForecast from '../components/HourlyForecast';
+import DailyForecast from '../components/DailyForecast';
 
 export default function SearchScreen({ route, navigation }: SearchScreenProps) {
+    console.log(`[${new Date().toLocaleTimeString()}] 👻 SearchScreen: 元件正在渲染...`);
     const [city, setCity] = useState('');
     const dispatch = useAppDispatch();
 
@@ -21,6 +26,10 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
         }
     }, [route.params?.city]);
 
+    useLayoutEffect(() => {
+        console.log(`[${new Date().toLocaleTimeString()}] 👻 SearchScreen: useLayoutEffect 被觸發了！`);
+    }, []);
+
     const handleSearch = (searchCity: string) => {
         const finalCity = searchCity.trim();
         if (!finalCity) return;
@@ -31,16 +40,9 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
         });
     };
 
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            title: '天氣查詢',
-            headerRight: () => (
-                <TouchableOpacity onPress={() => navigation.navigate('History')}>
-                    <MaterialIcons name="history" size={28} color="#fff" />
-                </TouchableOpacity>
-            ),
-        });
-    }, [navigation])
+    const handleGotoHistory = () => {
+        navigation.navigate('History');
+    }
 
     return (
         <View style={styles.pageContainer}>
@@ -52,7 +54,12 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
                     onChangeText={setCity}
                     onSubmitEditing={() => handleSearch(city)}
                 />
-                <Button title="搜尋" onPress={() => handleSearch(city)} />
+                <Pressable style={styles.searchButton} onPress={() => handleSearch(city)}>
+                    <Text style={styles.searchButtonText}>搜尋</Text>
+                </Pressable>
+                <Pressable style={styles.historyContainer}>
+                    <MaterialIcons name="history" size={24} color="#007cdb" onPress={handleGotoHistory} />
+                </Pressable>
             </View>
 
             {loading === 'pending' && <ActivityIndicator size="large" color="#1e90ff" style={{ marginTop: 20 }} />}
@@ -60,11 +67,45 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             {weatherData && loading === 'succeeded' && (
-                <View style={styles.weatherCard}>
-                    <Text style={styles.cityName}>{weatherData.name}</Text>
-                    <Text style={styles.temperature}>{Math.round(weatherData.main.temp)}°C</Text>
-                    <Text style={styles.description}>{weatherData.weather[0].description}</Text>
-                    <Text style={styles.humidity}>濕度: {weatherData.main.humidity}%</Text>
+                <View style={styles.weatherContainer}>
+                    <HeaderInfo />
+                    <CurrentWeather />
+                    <View style={styles.weatherHourlyCard}>
+                        <HourlyForecast time='4 PM' icon='sunny' temp='28' />
+                        <HourlyForecast time='5 PM' icon='cloudy' temp='26' />
+                        <HourlyForecast time='6 PM' icon='rainy' temp='26' />
+                        <HourlyForecast time='7 PM' icon='rainy' temp='25' />
+                    </View>
+                    <ScrollView>
+                        <View>
+                            <DailyForecast
+                                day='Tuesday'
+                                icon='rainy'
+                                tempHigh='73'
+                                tempLow='60'
+                            />
+                            <DailyForecast
+                                day='Wednesday'
+                                icon='cloudy'
+                                tempHigh='75'
+                                tempLow='62'
+                            />
+                            <DailyForecast
+                                day='Thursday'
+                                icon='sunny'
+                                tempHigh='77'
+                                tempLow='64'
+                            />
+                            <DailyForecast day='Friday' icon='sunny' tempHigh='79' tempLow='65' />
+                            <DailyForecast
+                                day='Saturday'
+                                icon='sunny'
+                                tempHigh='81'
+                                tempLow='66'
+                            />
+                            <DailyForecast day='Sunday' icon='sunny' tempHigh='82' tempLow='67' />
+                        </View>
+                    </ScrollView>
                 </View>
             )}
         </View>
@@ -72,13 +113,81 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
 }
 
 const styles = StyleSheet.create({
-    pageContainer: { flex: 1, padding: 20, backgroundColor: '#f0f8ff' },
-    inputContainer: { flexDirection: 'row', alignItems: 'center' },
-    textInput: { flex: 1, borderWidth: 1, borderColor: '#ccc', padding: 10, marginRight: 10, borderRadius: 8, backgroundColor: '#fff', fontSize: 16 },
-    errorText: { color: 'red', textAlign: 'center', marginTop: 20 },
-    weatherCard: { marginTop: 30, backgroundColor: '#fff', borderRadius: 15, padding: 25, alignItems: 'center', elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5 },
-    cityName: { fontSize: 28, fontWeight: 'bold' },
-    temperature: { fontSize: 64, fontWeight: '200', marginVertical: 10, color: '#1e90ff' },
-    description: { fontSize: 20, textTransform: 'capitalize' },
-    humidity: { fontSize: 16, color: '#666', marginTop: 10 },
+    pageContainer: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: '#f0f8ff'
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    textInput: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        padding: 8,
+        marginRight: 8,
+        borderRadius: 8,
+        backgroundColor: '#fff',
+        fontSize: 16
+    },
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 16
+    },
+    weatherContainer: {
+        flex: 1,
+        padding: 16,
+        borderRadius: 8,
+        backgroundColor: '#007cdb'
+    },
+    weatherHourlyCard: {
+        marginTop: 32,
+        backgroundColor: '#fff',
+        borderRadius: 15,
+        padding: 24,
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 5
+    },
+    cityName: {
+        fontSize: 28,
+        fontWeight: 'bold'
+    },
+    temperature: {
+        fontSize: 64,
+        fontWeight: '200',
+        marginVertical: 8,
+        color: '#1e90ff'
+    },
+    description: {
+        fontSize: 20,
+        textTransform: 'capitalize'
+    },
+    humidity: {
+        fontSize: 16,
+        color: '#666',
+        marginTop: 8
+    },
+    searchButton: {
+        backgroundColor: '#007cdb',
+        padding: 8,
+        borderRadius: 8,
+    },
+    searchButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        textAlign: 'center'
+    },
+    historyContainer: {
+        paddingLeft: 8,
+    },
 });
