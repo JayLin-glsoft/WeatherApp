@@ -11,6 +11,7 @@ import CurrentWeather from '../components/CurrentWeather';
 import HourlyForecast from '../components/HourlyForecast';
 import DailyForecast from '../components/DailyForecast';
 import { LocationData } from '../api/weatherAPI';
+import { weatherIcons } from '../config/weatherIconsConfig';
 
 export default function SearchScreen({ route, navigation }: SearchScreenProps) {
     console.log(`[${new Date().toLocaleTimeString()}] 👻 SearchScreen: 元件正在渲染...`);
@@ -53,6 +54,27 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
         navigation.navigate('History');
     }
 
+    const mapWeatherIcon = (iconCode: string): keyof typeof weatherIcons => {
+        if (iconCode.startsWith('01')) return 'sunny';
+        if (['02d', '02n', '03d', '03n', '04d', '04n', '50d', '50n'].includes(iconCode)) return 'cloudy';
+        if (['09d', '09n', '10d', '10n', '11d', '11n', '13d', '13n'].includes(iconCode)) return 'rainy';
+        return 'sunny';
+    };
+
+    const formatUnixTime = (unixTime: number, format: 'date' | 'time' | 'day') => {
+        const date = new Date(unixTime * 1000);
+        switch (format) {
+            case 'date':
+                return date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            case 'time':
+                return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }).replace(' ', '');
+            case 'day':
+                return date.toLocaleDateString('zh-TW', { weekday: 'long' });
+            default:
+                return '';
+        }
+    };
+
     return (
         <View style={styles.pageContainer}>
             <View style={styles.inputContainer}>
@@ -77,42 +99,36 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
 
             {weatherData && loading === 'succeeded' && (
                 <View style={styles.weatherContainer}>
-                    <HeaderInfo name='Taipei' day='2025/07/09'/>
-                    <CurrentWeather icon='sunny' temp='28' description='Clear'/>
+                    <HeaderInfo
+                        name={weatherData.location.name}
+                        day={formatUnixTime(weatherData.current.dt, 'date')}
+                    />
+                    <CurrentWeather
+                        icon={mapWeatherIcon(weatherData.current.weather[0].icon)}
+                        temp={Math.round(weatherData.current.temp).toString()}
+                        description={weatherData.current.weather[0].description}
+                    />
                     <View style={styles.weatherHourlyCard}>
-                        <HourlyForecast time='4 PM' icon='sunny' temp='28' />
-                        <HourlyForecast time='5 PM' icon='cloudy' temp='26' />
-                        <HourlyForecast time='6 PM' icon='rainy' temp='26' />
-                        <HourlyForecast time='7 PM' icon='rainy' temp='25' />
+                        {weatherData.hourly.slice(0, 4).map((hour, index) => (
+                            <HourlyForecast
+                                key={index}
+                                time={formatUnixTime(hour.dt, 'time')}
+                                icon={mapWeatherIcon(hour.weather[0].icon)}
+                                temp={Math.round(hour.temp).toString()}
+                            />
+                        ))}
                     </View>
                     <ScrollView style={styles.weatherDaily}>
                         <View>
-                            <DailyForecast
-                                day='Tuesday'
-                                icon='rainy'
-                                tempHigh='73'
-                                tempLow='60'
-                            />
-                            <DailyForecast
-                                day='Wednesday'
-                                icon='cloudy'
-                                tempHigh='75'
-                                tempLow='62'
-                            />
-                            <DailyForecast
-                                day='Thursday'
-                                icon='sunny'
-                                tempHigh='77'
-                                tempLow='64'
-                            />
-                            <DailyForecast day='Friday' icon='sunny' tempHigh='79' tempLow='65' />
-                            <DailyForecast
-                                day='Saturday'
-                                icon='sunny'
-                                tempHigh='81'
-                                tempLow='66'
-                            />
-                            <DailyForecast day='Sunday' icon='sunny' tempHigh='82' tempLow='67' />
+                            {weatherData.daily.slice(0, 7).map((day, index) => (
+                                <DailyForecast
+                                    key={index}
+                                    day={formatUnixTime(day.dt, 'day')}
+                                    icon={mapWeatherIcon(day.weather[0].icon)}
+                                    tempHigh={Math.round(day.temp.max).toString()}
+                                    tempLow={Math.round(day.temp.min).toString()}
+                                />
+                            ))}
                         </View>
                     </ScrollView>
                 </View>
