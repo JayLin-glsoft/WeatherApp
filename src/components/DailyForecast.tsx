@@ -1,26 +1,13 @@
 import React, { FC, ComponentType } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { AntDesign, Feather, MaterialIcons } from '@expo/vector-icons'
-
-type AntDesignNames = keyof typeof AntDesign.glyphMap
-type FeatherNames = keyof typeof Feather.glyphMap
-
-interface WeatherIconConfig {
-  component: ComponentType<any>
-  name: AntDesignNames | FeatherNames
-}
+import { AntDesign, Feather } from '@expo/vector-icons'
+import { weatherIcons } from '../config/weatherIconsConfig'
 
 interface DailyForecastProps {
   day: string
   icon: keyof typeof weatherIcons
   tempHigh: string
   tempLow: string
-}
-
-const weatherIcons: Record<string, WeatherIconConfig> = {
-  sunny: { component: Feather, name: 'sun' },
-  cloudy: { component: AntDesign, name: 'cloudo' },
-  rainy: { component: Feather, name: 'cloud-rain' }
 }
 
 const DailyForecast: FC<DailyForecastProps> = ({
@@ -31,11 +18,12 @@ const DailyForecast: FC<DailyForecastProps> = ({
 }) => {
   const IconComponent = weatherIcons[icon]?.component || AntDesign || Feather
   const iconName = weatherIcons[icon]?.name || 'question'
+  const iconColor =  weatherIcons[icon]?.color || '#ded8d8'
 
   return (
     <View style={styles.container}>
       <Text style={styles.day}>{day}</Text>
-      <IconComponent name={iconName} size={30} color='#ded8d8' />
+      <IconComponent name={iconName} size={36} color={iconColor} />
       <Text style={styles.temperature}>
         {tempHigh}° / {tempLow}°
       </Text>
@@ -54,12 +42,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   temperature: {
-    fontSize: 48,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#333'
   },
   day: {
-    fontSize: 24,
+    fontSize: 32,
     color: '#666'
   }
 })

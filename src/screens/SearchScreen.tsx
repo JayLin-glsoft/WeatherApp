@@ -2,7 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
-import { fetchWeather, saveHistory } from '../redux/weatherSlice';
+import { fetchWeather, fetchWeatherByHistory, saveHistory } from '../redux/weatherSlice';
 import { SearchScreenProps } from '../navigation/AppNavigator';
 import { useAppDispatch } from '../redux/hooks'; // 使用型別安全的 hook
 import { RootState } from '../redux/store';
@@ -10,6 +10,7 @@ import HeaderInfo from '../components/HeaderInfo';
 import CurrentWeather from '../components/CurrentWeather';
 import HourlyForecast from '../components/HourlyForecast';
 import DailyForecast from '../components/DailyForecast';
+import { LocationData } from '../api/weatherAPI';
 
 export default function SearchScreen({ route, navigation }: SearchScreenProps) {
     console.log(`[${new Date().toLocaleTimeString()}] 👻 SearchScreen: 元件正在渲染...`);
@@ -19,23 +20,31 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
     const { weatherData, loading, error } = useSelector((state: RootState) => state.weather);
 
     useEffect(() => {
-        if (route.params?.city) {
-            const cityFromHistory = route.params.city;
-            setCity(cityFromHistory);
-            handleSearch(cityFromHistory);
+        if (route.params?.locationData) {
+            const cityFromHistory = route.params.locationData;
+            setCity(cityFromHistory.name);
+            handleSearchByHistory(cityFromHistory);
         }
-    }, [route.params?.city]);
+    }, [route.params?.locationData]);
 
     useLayoutEffect(() => {
         console.log(`[${new Date().toLocaleTimeString()}] 👻 SearchScreen: useLayoutEffect 被觸發了！`);
     }, []);
+
+    const handleSearchByHistory = (locationData: LocationData) => {
+        dispatch(fetchWeatherByHistory(locationData)).then(action => {
+            if (fetchWeather.fulfilled.match(action)) {
+                dispatch(saveHistory(action.payload.location));
+            }
+        });
+    };
 
     const handleSearch = (searchCity: string) => {
         const finalCity = searchCity.trim();
         if (!finalCity) return;
         dispatch(fetchWeather(finalCity)).then(action => {
             if (fetchWeather.fulfilled.match(action)) {
-                dispatch(saveHistory(action.payload.name));
+                dispatch(saveHistory(action.payload.location));
             }
         });
     };
@@ -68,8 +77,8 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
 
             {weatherData && loading === 'succeeded' && (
                 <View style={styles.weatherContainer}>
-                    <HeaderInfo />
-                    <CurrentWeather />
+                    <HeaderInfo name='Taipei' day='2025/07/09'/>
+                    <CurrentWeather icon='sunny' temp='28' description='Clear'/>
                     <View style={styles.weatherHourlyCard}>
                         <HourlyForecast time='4 PM' icon='sunny' temp='28' />
                         <HourlyForecast time='5 PM' icon='cloudy' temp='26' />
@@ -159,8 +168,8 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.1,
         shadowRadius: 5,
-        flexDirection: 'row', // 將子元件水平排列
-        justifyContent: 'space-around', // 均勻分佈子元件
+        flexDirection: 'row', // 將元件水平排列
+        justifyContent: 'space-around', // 均勻分佈元件
     },
     weatherDaily: {
         marginTop: 16,

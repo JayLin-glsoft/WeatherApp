@@ -4,10 +4,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
 import SearchScreen from '../screens/SearchScreen';
 import HistoryScreen from '../screens/HistoryScreen';
+import { LocationData } from '../api/weatherAPI';
 
 // 定義導覽畫面的參數型別
 export type RootStackParamList = {
-    Search: { city?: string }; // Search 頁可以接收一個可選的 city 參數
+    Search: { locationData?: LocationData }; // Search 頁可以接收一個可選的 city 參數
     History: undefined; // History 頁不需要參數
 };
 

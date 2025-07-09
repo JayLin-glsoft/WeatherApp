@@ -1,9 +1,18 @@
+import { FC } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
-const HeaderInfo = () => (
+interface HeaderInfoProps {
+    name: string
+    day: string
+}
+
+const HeaderInfo: FC<HeaderInfoProps> = ({
+        name,
+        day
+    }) => (
   <View style={styles.container}>
-    <Text style={styles.headerText}>Taipei</Text>
-    <Text style={styles.subText}>Monday, 12 September</Text>
+    <Text style={styles.headerText}>{name}</Text>
+    <Text style={styles.subText}>{day}</Text>
   </View>
 )
 

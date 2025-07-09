@@ -32,9 +32,9 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         style={styles.historyItem}
-                        onPress={() => navigation.navigate('Search', { city: item })}
+                        onPress={() => navigation.navigate('Search', { locationData: item })}
                     >
-                        <Text style={styles.historyText}>{item}</Text>
+                        <Text style={styles.historyText}>{item.name}</Text>
                     </TouchableOpacity>
                 )}
                 ListEmptyComponent={<Text style={styles.emptyText}>目前沒有歷史紀錄。</Text>}

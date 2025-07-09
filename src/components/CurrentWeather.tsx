@@ -1,13 +1,31 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, Feather } from '@expo/vector-icons'
+import { weatherIcons } from '../config/weatherIconsConfig'
+import { FC } from 'react'
 
-const CurrentWeather = () => (
-  <View style={styles.container}>
-    <AntDesign name='cloudo' size={60} color='#ded8d8' />
-    <Text style={styles.temperature}>28°</Text>
-    <Text style={styles.description}>Partly Cloudy</Text>
-  </View>
-)
+interface CurrentWeatherProps {
+    description: string
+    icon: keyof typeof weatherIcons
+    temp: string
+}
+
+const CurrentWeather: FC<CurrentWeatherProps> = ({
+    description,
+    icon,
+    temp
+}) => {
+    const IconComponent = weatherIcons[icon]?.component || AntDesign || Feather
+    const iconName = weatherIcons[icon]?.name || 'question'
+    const iconColor = weatherIcons[icon]?.color || '#ded8d8'
+
+    return (
+        <View style={styles.container}>
+            <IconComponent name={iconName} size={60} color={iconColor} />
+            <Text style={styles.temperature}>{temp}°</Text>
+            <Text style={styles.description}>{description}</Text>
+        </View>
+    )
+}
 
 export default CurrentWeather
 
