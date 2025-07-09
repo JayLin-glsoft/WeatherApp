@@ -13,10 +13,10 @@ export default CurrentWeather
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f8ff'
+        backgroundColor: '#f0f8ff',
+        borderRadius: 15,
     },
     temperature: {
         fontSize: 48,

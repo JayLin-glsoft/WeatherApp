@@ -76,7 +76,7 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
                         <HourlyForecast time='6 PM' icon='rainy' temp='26' />
                         <HourlyForecast time='7 PM' icon='rainy' temp='25' />
                     </View>
-                    <ScrollView>
+                    <ScrollView style={styles.weatherDaily}>
                         <View>
                             <DailyForecast
                                 day='Tuesday'
@@ -141,10 +141,12 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         borderRadius: 8,
+        marginTop: 16,
+        elevation: 5,
         backgroundColor: '#007cdb'
     },
     weatherHourlyCard: {
-        marginTop: 32,
+        marginTop: 16,
         backgroundColor: '#fff',
         borderRadius: 15,
         padding: 24,
@@ -156,7 +158,23 @@ const styles = StyleSheet.create({
             height: 2
         },
         shadowOpacity: 0.1,
-        shadowRadius: 5
+        shadowRadius: 5,
+        flexDirection: 'row', // 將子元件水平排列
+        justifyContent: 'space-around', // 均勻分佈子元件
+    },
+    weatherDaily: {
+        marginTop: 16,
+        backgroundColor: '#fff',
+        borderRadius: 15,
+        padding: 16,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
     },
     cityName: {
         fontSize: 28,

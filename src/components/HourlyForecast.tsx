@@ -40,18 +40,16 @@ export default HourlyForecast
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff'
   },
   temperature: {
-    fontSize: 48,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333'
   },
   time: {
-    fontSize: 24,
+    fontSize: 18,
     color: '#666'
   }
 })

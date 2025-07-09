@@ -47,10 +47,11 @@ export default DailyForecast
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff'
+    backgroundColor: '#f0f8ff',
+    borderRadius: 15,
+    marginBottom: 16,
   },
   temperature: {
     fontSize: 48,
