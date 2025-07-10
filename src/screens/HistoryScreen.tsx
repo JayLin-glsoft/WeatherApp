@@ -39,7 +39,9 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
                     return (
                         <TouchableOpacity
                             style={styles.historyItem}
-                            onPress={() => navigation.navigate('Search', { locationData: item })}
+                            onPress={() => {
+                                navigation.popTo('Search', { locationData: item });
+                            }}
                         >
                             <Text style={styles.historyText}>{displayName}</Text>
                         </TouchableOpacity>

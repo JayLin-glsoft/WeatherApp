@@ -3,10 +3,11 @@ import { AntDesign, Feather } from '@expo/vector-icons'
 
 export type AntDesignNames = keyof typeof AntDesign.glyphMap
 export type FeatherNames = keyof typeof Feather.glyphMap
+export type WeatherIconName = AntDesignNames | FeatherNames;
 
 export interface WeatherIconConfig {
   component: ComponentType<any>
-  name: AntDesignNames | FeatherNames
+  name: WeatherIconName
   color: string
 }
 

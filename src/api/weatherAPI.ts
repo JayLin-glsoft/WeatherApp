@@ -1,5 +1,10 @@
-// 先 hardcode 在這裡
-const API_KEY = 'fe4cd994f90ae003f066d7b393ac1379';
+// 從環境變數讀取 API 金鑰
+const API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
+
+// 確保 API 金鑰存在
+if (!API_KEY) {
+  throw new Error('請在 .env 檔案中設定您的 OpenWeatherMap API 金鑰 (EXPO_PUBLIC_WEATHER_API_KEY)');
+}
 const API_2_5_URL = (city: string) => `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=zh_tw`;
 const API_3_0_URL = (lon: number, lat: number) => `https://api.openweathermap.org/data/3.0/onecall?lon=${lon}&lat=${lat}&exclude=minutely&appid=${API_KEY}&units=metric&lang=zh_tw`;
 

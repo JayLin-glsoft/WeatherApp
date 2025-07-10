@@ -10,7 +10,6 @@ import HeaderInfo from '../components/HeaderInfo';
 import CurrentWeather from '../components/CurrentWeather';
 import HourlyForecast from '../components/HourlyForecast';
 import DailyForecast from '../components/DailyForecast';
-import { LocationData } from '../api/weatherAPI';
 import { weatherIcons } from '../config/weatherIconsConfig';
 import { cityMapping, englishToChineseMapping } from '../config/cityMapping';
 
@@ -20,22 +19,25 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
 
     const { weatherData, loading, error } = useSelector((state: RootState) => state.weather);
 
-    useEffect(() => {
-        if (route.params?.locationData) {
-            const cityFromHistory = route.params.locationData;
-            const mappedCity = cityMapping[cityFromHistory.name.toLowerCase()] || cityFromHistory.name;
-            setCity(cityFromHistory.name);
-            handleSearchByHistory(cityFromHistory);
-        }
-    }, [route.params?.locationData]);
-
-    const handleSearchByHistory = (locationData: LocationData) => {
-        dispatch(fetchWeatherByHistory(locationData)).then(action => {
-            if (fetchWeather.fulfilled.match(action)) {
+    const handleSearchAction = (actionCreator: any) => (searchParam: any) => {
+        dispatch(actionCreator(searchParam)).then((action: any) => {
+            if (action.meta.requestStatus === 'fulfilled') {
                 dispatch(saveHistory(action.payload.location));
             }
         });
     };
+
+    const handleSearchByCity = handleSearchAction(fetchWeather);
+    const handleSearchByHistory = handleSearchAction(fetchWeatherByHistory);
+
+    useEffect(() => {
+        if (route.params?.locationData) {
+            const cityFromHistory = route.params.locationData;
+            const mappedCity = englishToChineseMapping[cityFromHistory.name.toLowerCase()] || cityFromHistory.name;
+            setCity(mappedCity);
+            handleSearchByHistory(cityFromHistory);
+        }
+    }, [route.params?.locationData]);
 
     const handleSearch = (searchCity: string) => {
         const finalCity = searchCity.trim();
@@ -43,11 +45,7 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
 
         const mappedCity = cityMapping[finalCity.toLowerCase()] || finalCity;
 
-        dispatch(fetchWeather(mappedCity)).then(action => {
-            if (fetchWeather.fulfilled.match(action)) {
-                dispatch(saveHistory(action.payload.location));
-            }
-        });
+        handleSearchByCity(mappedCity);
     };
 
     const handleGotoHistory = () => {
