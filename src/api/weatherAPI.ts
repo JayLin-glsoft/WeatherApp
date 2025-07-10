@@ -10,12 +10,14 @@ export const fetchWeatherDataAPI = async (city: string): Promise<WeatherDataWith
         throw new Error('找不到該城市的資訊');
     }
     const data: LocationData = await response.json();
+    // 改存使用者輸入的地名
+    data.name = city;
     // 使用 GPS 資訊查詢天氣資料
-    const weatherDataWithLocation = await fetchWeatherDataAPIByHistory(data);
+    const weatherDataWithLocation = await fetchWeatherDataAPIByLocation(data);
     return weatherDataWithLocation;
 };
 
-export const fetchWeatherDataAPIByHistory = async (locationData: LocationData): Promise<WeatherDataWithLocation> => {
+export const fetchWeatherDataAPIByLocation = async (locationData: LocationData): Promise<WeatherDataWithLocation> => {
     // 使用 GPS 資訊查詢天氣資料
     const weatherResponse = await fetch(API_3_0_URL(locationData.coord.lon, locationData.coord.lat));
     if (!weatherResponse.ok) {

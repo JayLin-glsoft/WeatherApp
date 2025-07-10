@@ -5,6 +5,7 @@ import { loadHistory, clearHistory } from '../redux/weatherSlice';
 import { HistoryScreenProps } from '../navigation/AppNavigator';
 import { useAppDispatch } from '../redux/hooks';
 import { RootState } from '../redux/store';
+import { englishToChineseMapping } from '../config/cityMapping';
 
 export default function HistoryScreen({ navigation }: HistoryScreenProps) {
     const dispatch = useAppDispatch();
@@ -29,14 +30,21 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
             <FlatList
                 data={history}
                 keyExtractor={(item, index) => `${item}-${index}`}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.historyItem}
-                        onPress={() => navigation.navigate('Search', { locationData: item })}
-                    >
-                        <Text style={styles.historyText}>{item.name}</Text>
-                    </TouchableOpacity>
-                )}
+                renderItem={({ item }) => {
+                    // 將 API 回傳的英文地名轉為小寫
+                    const englishName = item.name.toLowerCase();
+                    // 使用對照表找到對應的中文名稱，如果找不到，就直接顯示英文原名
+                    const displayName = englishToChineseMapping[englishName] || item.name;
+
+                    return (
+                        <TouchableOpacity
+                            style={styles.historyItem}
+                            onPress={() => navigation.navigate('Search', { locationData: item })}
+                        >
+                            <Text style={styles.historyText}>{displayName}</Text>
+                        </TouchableOpacity>
+                    );
+                }}
                 ListEmptyComponent={<Text style={styles.emptyText}>目前沒有歷史紀錄。</Text>}
                 style={{ marginTop: 20 }}
             />

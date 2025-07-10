@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Text, StyleSheet, ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { fetchWeather, fetchWeatherByHistory, saveHistory } from '../redux/weatherSlice';
@@ -12,9 +12,9 @@ import HourlyForecast from '../components/HourlyForecast';
 import DailyForecast from '../components/DailyForecast';
 import { LocationData } from '../api/weatherAPI';
 import { weatherIcons } from '../config/weatherIconsConfig';
+import { cityMapping, englishToChineseMapping } from '../config/cityMapping';
 
 export default function SearchScreen({ route, navigation }: SearchScreenProps) {
-    console.log(`[${new Date().toLocaleTimeString()}] 👻 SearchScreen: 元件正在渲染...`);
     const [city, setCity] = useState('');
     const dispatch = useAppDispatch();
 
@@ -23,14 +23,11 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
     useEffect(() => {
         if (route.params?.locationData) {
             const cityFromHistory = route.params.locationData;
+            const mappedCity = cityMapping[cityFromHistory.name.toLowerCase()] || cityFromHistory.name;
             setCity(cityFromHistory.name);
             handleSearchByHistory(cityFromHistory);
         }
     }, [route.params?.locationData]);
-
-    useLayoutEffect(() => {
-        console.log(`[${new Date().toLocaleTimeString()}] 👻 SearchScreen: useLayoutEffect 被觸發了！`);
-    }, []);
 
     const handleSearchByHistory = (locationData: LocationData) => {
         dispatch(fetchWeatherByHistory(locationData)).then(action => {
@@ -43,7 +40,10 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
     const handleSearch = (searchCity: string) => {
         const finalCity = searchCity.trim();
         if (!finalCity) return;
-        dispatch(fetchWeather(finalCity)).then(action => {
+
+        const mappedCity = cityMapping[finalCity.toLowerCase()] || finalCity;
+
+        dispatch(fetchWeather(mappedCity)).then(action => {
             if (fetchWeather.fulfilled.match(action)) {
                 dispatch(saveHistory(action.payload.location));
             }
@@ -80,7 +80,7 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.textInput}
-                    placeholder="輸入城市名稱 (例如: Taipei)"
+                    placeholder="輸入城市名稱 (例如: 臺中)"
                     value={city}
                     onChangeText={setCity}
                     onSubmitEditing={() => handleSearch(city)}
@@ -100,7 +100,7 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
             {weatherData && loading === 'succeeded' && (
                 <View style={styles.weatherContainer}>
                     <HeaderInfo
-                        name={weatherData.location.name}
+                        name={englishToChineseMapping[weatherData.location.name.toLowerCase()] || weatherData.location.name}
                         day={formatUnixTime(weatherData.current.dt, 'date')}
                     />
                     <CurrentWeather
@@ -184,25 +184,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 15,
         padding: 16,
-    },
-    cityName: {
-        fontSize: 28,
-        fontWeight: 'bold'
-    },
-    temperature: {
-        fontSize: 64,
-        fontWeight: '200',
-        marginVertical: 8,
-        color: '#1e90ff'
-    },
-    description: {
-        fontSize: 20,
-        textTransform: 'capitalize'
-    },
-    humidity: {
-        fontSize: 16,
-        color: '#666',
-        marginTop: 8
     },
     searchButton: {
         backgroundColor: '#007cdb',

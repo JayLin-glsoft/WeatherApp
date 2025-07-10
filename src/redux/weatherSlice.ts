@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchWeatherDataAPI, fetchWeatherDataAPIByHistory, WeatherDataWithLocation, LocationData } from '../api/weatherAPI';
+import { fetchWeatherDataAPI, fetchWeatherDataAPIByLocation, WeatherDataWithLocation, LocationData } from '../api/weatherAPI';
 import { RootState } from './store';
 
 const HISTORY_KEY = '@weatherHistory';
@@ -37,7 +37,7 @@ export const fetchWeatherByHistory = createAsyncThunk<WeatherDataWithLocation, L
     'weather/fetchWeatherByHistory',
     async (history, { rejectWithValue }) => {
         try {
-            const data = await fetchWeatherDataAPIByHistory(history);
+            const data = await fetchWeatherDataAPIByLocation(history);
             return data;
         } catch (error: any) {
             return rejectWithValue(error.message);
