@@ -17,7 +17,7 @@ const HourlyForecast: FC<HourlyForecastProps> = ({ time, icon, temp }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.time}>{time}</Text>
-      <IconComponent name={iconName} size={30} color={iconColor} />
+      <IconComponent name={iconName} size={26} color={iconColor} marginBottom={8} />
       <Text style={styles.temperature}>{temp}°</Text>
     </View>
   )
@@ -27,16 +27,20 @@ export default HourlyForecast
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#008cdb',
+    borderRadius: 15,
+    padding: 8,
   },
   temperature: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333'
+    color: '#fff'
   },
   time: {
     fontSize: 18,
-    color: '#666'
+    color: '#fff',
+    marginBottom: 8,
   }
 })

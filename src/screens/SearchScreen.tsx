@@ -118,7 +118,7 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
                             />
                         ))}
                     </View>
-                    <ScrollView style={styles.weatherDaily}>
+                    <ScrollView style={styles.weatherDaily} showsVerticalScrollIndicator={false}>
                         <View>
                             {weatherData.daily.slice(0, 7).map((day, index) => (
                                 <DailyForecast
@@ -165,41 +165,25 @@ const styles = StyleSheet.create({
     weatherContainer: {
         flex: 1,
         padding: 16,
-        borderRadius: 8,
+        borderRadius: 15,
         marginTop: 16,
         elevation: 5,
         backgroundColor: '#007cdb'
     },
     weatherHourlyCard: {
-        marginTop: 16,
         backgroundColor: '#fff',
         borderRadius: 15,
-        padding: 24,
         alignItems: 'center',
         elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
+        padding: 16,
+        marginBottom: 16,
         flexDirection: 'row', // 將元件水平排列
-        justifyContent: 'space-around', // 均勻分佈元件
+        justifyContent: 'space-between', // 均勻分佈元件
     },
     weatherDaily: {
-        marginTop: 16,
         backgroundColor: '#fff',
         borderRadius: 15,
         padding: 16,
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
     },
     cityName: {
         fontSize: 28,

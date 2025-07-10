@@ -20,15 +20,16 @@ export default HeaderInfo
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
+        marginBottom: 16,
     },
     headerText: {
-        fontSize: 24,
+        fontSize: 32,
         fontWeight: 'bold',
-        color: '#fff'
+        color: '#fff',
+        marginBottom: 8
     },
     subText: {
-        fontSize: 14,
+        fontSize: 20,
         color: '#ccc'
     }
 });

@@ -23,7 +23,7 @@ const DailyForecast: FC<DailyForecastProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.day}>{day}</Text>
-      <IconComponent name={iconName} size={36} color={iconColor} />
+      <IconComponent name={iconName} size={48} color={iconColor} />
       <Text style={styles.temperature}>
         {tempHigh}° / {tempLow}°
       </Text>
@@ -35,19 +35,21 @@ export default DailyForecast
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff',
+    backgroundColor: '#008cdb',
+    flexDirection: 'row',
     borderRadius: 15,
     marginBottom: 16,
+    padding: 16,
   },
   temperature: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#333'
+    color: '#fff'
   },
   day: {
-    fontSize: 32,
-    color: '#666'
+    fontSize: 26,
+    color: '#fff'
   }
 })

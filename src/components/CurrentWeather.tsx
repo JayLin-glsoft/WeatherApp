@@ -20,9 +20,9 @@ const CurrentWeather: FC<CurrentWeatherProps> = ({
 
     return (
         <View style={styles.container}>
+            <Text style={styles.description}>{description}</Text>
             <IconComponent name={iconName} size={60} color={iconColor} />
             <Text style={styles.temperature}>{temp}°</Text>
-            <Text style={styles.description}>{description}</Text>
         </View>
     )
 }
@@ -31,18 +31,20 @@ export default CurrentWeather
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#f0f8ff',
+        backgroundColor: 'transparent',
+        flexDirection: 'row',
         borderRadius: 15,
+        marginBottom: 16,
     },
     temperature: {
         fontSize: 48,
         fontWeight: 'bold',
-        color: '#333'
+        color: '#fff'
     },
     description: {
         fontSize: 24,
-        color: '#666'
+        color: '#fff'
     },
 });
