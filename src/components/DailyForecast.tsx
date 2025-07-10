@@ -1,4 +1,3 @@
-import React, { FC, ComponentType } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { AntDesign, Feather } from '@expo/vector-icons'
 import { weatherIcons } from '../config/weatherIconsConfig'
@@ -10,12 +9,12 @@ interface DailyForecastProps {
   tempLow: string
 }
 
-const DailyForecast: FC<DailyForecastProps> = ({
+const DailyForecast = ({
   day,
   icon,
   tempHigh,
   tempLow
-}) => {
+}: DailyForecastProps) => {
   const IconComponent = weatherIcons[icon]?.component || AntDesign || Feather
   const iconName = weatherIcons[icon]?.name || 'question'
   const iconColor =  weatherIcons[icon]?.color || '#ded8d8'

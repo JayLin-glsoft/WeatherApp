@@ -1,22 +1,13 @@
 import React, { useEffect } from 'react';
 import { View, Pressable, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useSelector } from 'react-redux';
 import { loadHistory, clearHistory } from '../redux/weatherSlice';
 import { HistoryScreenProps } from '../navigation/AppNavigator';
-import { useAppDispatch } from '../redux/hooks';
-import { RootState } from '../redux/store';
-import { englishToChineseMapping } from '../config/cityMapping';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { cityNameMap } from '../config/cityMapping';
 
 export default function HistoryScreen({ navigation }: HistoryScreenProps) {
     const dispatch = useAppDispatch();
-    const { history } = useSelector((state: RootState) => state.weather);
-
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            dispatch(loadHistory());
-        });
-        return unsubscribe;
-    }, [navigation, dispatch]);
+    const { history } = useAppSelector((state) => state.weather);
 
     const handleClear = () => {
         Alert.alert("清除歷史紀錄", "您確定要清除所有查詢紀錄嗎？", [
@@ -24,6 +15,14 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
             { text: "確定", onPress: () => dispatch(clearHistory()), style: 'destructive' },
         ]);
     };
+
+    // 當畫面聚焦時重新載入歷史紀錄
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            dispatch(loadHistory());
+        });
+        return unsubscribe;
+    }, [navigation, dispatch]);
 
     return (
         <View style={styles.pageContainer}>
@@ -34,7 +33,7 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
                     // 將 API 回傳的英文地名轉為小寫
                     const englishName = item.name.toLowerCase();
                     // 使用對照表找到對應的中文名稱，如果找不到，就直接顯示英文原名
-                    const displayName = englishToChineseMapping[englishName] || item.name;
+                    const displayName = cityNameMap.enToZh[englishName] || item.name;
 
                     return (
                         <TouchableOpacity

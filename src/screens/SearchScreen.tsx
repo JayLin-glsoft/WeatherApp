@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Text, StyleSheet, ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useSelector } from 'react-redux';
 import { fetchWeather, fetchWeatherByHistory, saveHistory } from '../redux/weatherSlice';
 import { SearchScreenProps } from '../navigation/AppNavigator';
-import { useAppDispatch } from '../redux/hooks'; // 使用型別安全的 hook
-import { RootState } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/hooks'; // 使用型別安全的 hook
 import HeaderInfo from '../components/HeaderInfo';
 import CurrentWeather from '../components/CurrentWeather';
 import HourlyForecast from '../components/HourlyForecast';
 import DailyForecast from '../components/DailyForecast';
 import { weatherIcons } from '../config/weatherIconsConfig';
-import { cityMapping, englishToChineseMapping } from '../config/cityMapping';
+import { cityNameMap} from '../config/cityMapping';
 
 export default function SearchScreen({ route, navigation }: SearchScreenProps) {
+    // 使用 useState 來管理輸入的城市名稱
     const [city, setCity] = useState('');
+    // 使用 Redux 的 dispatch (透過 hooks)
     const dispatch = useAppDispatch();
+    // 從 Redux store 中選擇需要的狀態 (透過 hooks)
+    const { weatherData, loading, error } = useAppSelector((state) => state.weather);
 
-    const { weatherData, loading, error } = useSelector((state: RootState) => state.weather);
-
+    // 定義一個通用的搜尋處理函數，接受 actionCreator 作為參數
     const handleSearchAction = (actionCreator: any) => (searchParam: any) => {
         dispatch(actionCreator(searchParam)).then((action: any) => {
             if (action.meta.requestStatus === 'fulfilled') {
@@ -27,23 +28,17 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
         });
     };
 
+    // 使用通用的搜尋處理函數來處理城市搜尋和歷史紀錄搜尋
     const handleSearchByCity = handleSearchAction(fetchWeather);
     const handleSearchByHistory = handleSearchAction(fetchWeatherByHistory);
 
-    useEffect(() => {
-        if (route.params?.locationData) {
-            const cityFromHistory = route.params.locationData;
-            const mappedCity = englishToChineseMapping[cityFromHistory.name.toLowerCase()] || cityFromHistory.name;
-            setCity(mappedCity);
-            handleSearchByHistory(cityFromHistory);
-        }
-    }, [route.params?.locationData]);
-
+    // 處理搜尋按鈕點擊事件
     const handleSearch = (searchCity: string) => {
         const finalCity = searchCity.trim();
         if (!finalCity) return;
 
-        const mappedCity = cityMapping[finalCity.toLowerCase()] || finalCity;
+        // 將輸入的城市名稱轉為小寫，並使用對照表進行映射
+        const mappedCity = cityNameMap.zhToEn[finalCity] || finalCity;
 
         handleSearchByCity(mappedCity);
     };
@@ -52,6 +47,7 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
         navigation.navigate('History');
     }
 
+    // 將天氣圖示代碼映射到對應的圖示名稱
     const mapWeatherIcon = (iconCode: string): keyof typeof weatherIcons => {
         if (iconCode.startsWith('01')) return 'sunny';
         if (['02d', '02n', '03d', '03n', '04d', '04n', '50d', '50n'].includes(iconCode)) return 'cloudy';
@@ -59,6 +55,7 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
         return 'sunny';
     };
 
+    // 將 Unix 時間戳轉換為指定格式的日期、時間或星期幾
     const formatUnixTime = (unixTime: number, format: 'date' | 'time' | 'day') => {
         const date = new Date(unixTime * 1000);
         switch (format) {
@@ -72,6 +69,16 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
                 return '';
         }
     };
+
+    // 如果有從歷史紀錄頁面傳來的城市資料，則自動填入並搜尋
+    useEffect(() => {
+        if (route.params?.locationData) {
+            const cityFromHistory = route.params.locationData;
+            const mappedCity = cityNameMap.enToZh[cityFromHistory.name.toLowerCase()] || cityFromHistory.name;
+            setCity(mappedCity);
+            handleSearchByHistory(cityFromHistory);
+        }
+    }, [route.params?.locationData]);
 
     return (
         <View style={styles.pageContainer}>
@@ -91,14 +98,15 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
                 </Pressable>
             </View>
 
-            {loading === 'pending' && <ActivityIndicator size="large" color="#1e90ff" style={{ marginTop: 20 }} />}
+            {/* 左邊的判別式為 true 或是物件不為空，才會渲染右邊的 UI */}
+            {loading === 'pending' && <ActivityIndicator size="large" color="#007cdb" style={{ marginTop: 36 }} />}
 
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             {weatherData && loading === 'succeeded' && (
                 <View style={styles.weatherContainer}>
                     <HeaderInfo
-                        name={englishToChineseMapping[weatherData.location.name.toLowerCase()] || weatherData.location.name}
+                        name={cityNameMap.enToZh[weatherData.location.name.toLowerCase()] || weatherData.location.name}
                         day={formatUnixTime(weatherData.current.dt, 'date')}
                     />
                     <CurrentWeather

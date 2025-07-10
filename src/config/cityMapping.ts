@@ -1,4 +1,5 @@
-export const cityMapping: { [key: string]: string } = {
+export const cityNameMap = {
+  zhToEn: {
     '臺北': 'taipei',
     '臺北市': 'taipei',
     '台北': 'taipei',
@@ -49,9 +50,8 @@ export const cityMapping: { [key: string]: string } = {
     '金門縣': 'kinmen',
     '連江': 'lienchiang',
     '連江縣': 'lienchiang',
-};
-
-export const englishToChineseMapping: { [key: string]: string } = {
+  },
+  enToZh: {
     'taipei': '臺北',
     'new taipei': '新北',
     'taoyuan': '桃園',
@@ -72,4 +72,5 @@ export const englishToChineseMapping: { [key: string]: string } = {
     'penghu': '澎湖',
     'kinmen': '金門',
     'lienchiang': '連江',
+  }
 };

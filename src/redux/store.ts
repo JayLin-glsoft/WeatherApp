@@ -3,6 +3,7 @@ import weatherReducer from './weatherSlice';
 
 export const store = configureStore({
   reducer: {
+    // 設定多個 reducer
     weather: weatherReducer,
   },
 });

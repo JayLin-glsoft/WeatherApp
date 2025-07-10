@@ -8,6 +8,7 @@ if (!API_KEY) {
 const API_2_5_URL = (city: string) => `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=zh_tw`;
 const API_3_0_URL = (lon: number, lat: number) => `https://api.openweathermap.org/data/3.0/onecall?lon=${lon}&lat=${lat}&exclude=minutely&appid=${API_KEY}&units=metric&lang=zh_tw`;
 
+// 直接收尋用的，會先呼叫 API_2_5_URL 取得 GPS 資訊，再呼叫 API_3_0_URL 取得天氣資料
 export const fetchWeatherDataAPI = async (city: string): Promise<WeatherDataWithLocation> => {
     // 使用城市名稱查詢 GPS 資訊
     const response = await fetch(API_2_5_URL(city));
@@ -22,6 +23,7 @@ export const fetchWeatherDataAPI = async (city: string): Promise<WeatherDataWith
     return weatherDataWithLocation;
 };
 
+// 用於歷史紀錄的查詢，直接使用歷史紀錄的 GPS 資訊查詢天氣資料
 export const fetchWeatherDataAPIByLocation = async (locationData: LocationData): Promise<WeatherDataWithLocation> => {
     // 使用 GPS 資訊查詢天氣資料
     const weatherResponse = await fetch(API_3_0_URL(locationData.coord.lon, locationData.coord.lat));
@@ -77,13 +79,13 @@ export interface CurrentWeather {
     visibility: number;
     wind_speed: number;
     wind_deg: number;
-    wind_gust?: number; // wind_gust 在某些情況下可能不存在
+    wind_gust?: number; 
     weather: WeatherCondition[];
-    rain?: RainInfo; // rain 在某些情況下可能不存在
+    rain?: RainInfo; 
 }
 
 // 小時預報的介面
-export interface HourlyForecast extends Omit<CurrentWeather, 'sunrise' | 'sunset'> {
+export interface HourlyForecast extends CurrentWeather {
     pop: number; // 降雨機率
 }
 

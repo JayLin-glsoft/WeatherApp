@@ -13,6 +13,7 @@ interface WeatherState {
     error: string | null;
 }
 
+// 定義 state 的初始值
 const initialState: WeatherState = {
     weatherData: null,
     history: [],
@@ -20,7 +21,7 @@ const initialState: WeatherState = {
     error: null,
 };
 
-// 建立一個非同步 Thunk 來獲取天氣資料
+// 建立一個 AsyncThun 來獲取天氣資料(用戶輸入的地名)
 export const fetchWeather = createAsyncThunk<WeatherDataWithLocation, string, { rejectValue: string }>(
     'weather/fetchWeather',
     async (city, { rejectWithValue }) => {
@@ -33,6 +34,7 @@ export const fetchWeather = createAsyncThunk<WeatherDataWithLocation, string, { 
     }
 );
 
+// 建立一個 AsyncThunk 來獲取天氣資料(歷史紀錄的地名)
 export const fetchWeatherByHistory = createAsyncThunk<WeatherDataWithLocation, LocationData, { rejectValue: string }>(
     'weather/fetchWeatherByHistory',
     async (history, { rejectWithValue }) => {
@@ -56,10 +58,11 @@ export const saveHistory = createAsyncThunk<LocationData[], LocationData, { stat
     'weather/saveHistory',
     async (locationData, { getState }) => {
         const { history } = getState().weather;
+        // 把新的放前面，並移除相同名稱的紀錄
         const newHistory = [
             locationData,
             ...history.filter(item => item.name.toLowerCase() !== locationData.name.toLowerCase())
-        ].slice(0, 10);
+        ];
         await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
         return newHistory;
     }
@@ -74,7 +77,9 @@ export const clearHistory = createAsyncThunk<LocationData[]>('weather/clearHisto
 const weatherSlice = createSlice({
     name: 'weather',
     initialState,
+    // 處理「這支 slice 自己定義的 action」（通常是同步行為）。
     reducers: {},
+    // 處理「其它地方產生的 action」（常見於 asyncThunk、外部 action），允許 slice 對這些 action 做反應。
     extraReducers: (builder) => {
         builder
             .addCase(fetchWeather.pending, (state) => {

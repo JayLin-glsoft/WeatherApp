@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { AntDesign, Feather } from '@expo/vector-icons'
 import { weatherIcons } from '../config/weatherIconsConfig'
-import { FC } from 'react'
 
 interface CurrentWeatherProps {
     description: string
@@ -9,11 +8,11 @@ interface CurrentWeatherProps {
     temp: string
 }
 
-const CurrentWeather: FC<CurrentWeatherProps> = ({
+const CurrentWeather = ({
     description,
     icon,
     temp
-}) => {
+}: CurrentWeatherProps) => {
     const IconComponent = weatherIcons[icon]?.component || AntDesign || Feather
     const iconName = weatherIcons[icon]?.name || 'question'
     const iconColor = weatherIcons[icon]?.color || '#ded8d8'
