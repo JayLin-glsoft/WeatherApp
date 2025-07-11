@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     },
     clearButton: {
         backgroundColor: '#ff6347',
-        padding: 12,
+        padding: 16,
         borderRadius: 8,
         alignItems: 'center',
         marginTop: 16,
