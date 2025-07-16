@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState, AppDispatch } from '../redux/store';
 import { View, Pressable, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { loadHistory, clearHistory } from '../redux/weatherSlice';
 import { HistoryScreenProps } from '../navigation/AppNavigator';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { cityNameMap } from '../config/cityMapping';
 
 export default function HistoryScreen({ navigation }: HistoryScreenProps) {
-    const dispatch = useAppDispatch();
-    const { history } = useAppSelector((state) => state.weather);
+    const dispatch = useDispatch<AppDispatch>();
+    const { history } = useSelector((state: RootState) => state.weather);
 
     const handleClear = () => {
         Alert.alert("清除歷史紀錄", "您確定要清除所有查詢紀錄嗎？", [

@@ -3,7 +3,8 @@ import { View, TextInput, Text, StyleSheet, ActivityIndicator, Pressable, Scroll
 import { MaterialIcons } from '@expo/vector-icons';
 import { fetchWeather, fetchWeatherByHistory, saveHistory } from '../redux/weatherSlice';
 import { SearchScreenProps } from '../navigation/AppNavigator';
-import { useAppDispatch, useAppSelector } from '../redux/hooks'; // 使用型別安全的 hook
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState, AppDispatch } from '../redux/store';
 import HeaderInfo from '../components/HeaderInfo';
 import CurrentWeather from '../components/CurrentWeather';
 import HourlyForecast from '../components/HourlyForecast';
@@ -15,9 +16,9 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
     // 使用 useState 來管理輸入的城市名稱
     const [city, setCity] = useState('');
     // 使用 Redux 的 dispatch (透過 hooks)
-    const dispatch = useAppDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     // 從 Redux store 中選擇需要的狀態 (透過 hooks)
-    const { weatherData, loading, error } = useAppSelector((state) => state.weather);
+    const { weatherData, loading, error } = useSelector((state: RootState) => state.weather);
 
     // 定義一個通用的搜尋處理函數，接受 actionCreator 作為參數
     const handleSearchAction = (actionCreator: any) => (searchParam: any) => {
