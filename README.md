@@ -14,6 +14,7 @@
     * 🔍 搜尋城市頁：輸入城市並查詢天氣
     * > ![search-1](images/search1.png)
     * > ![search-2](images/search2.png)
+    * > ![search-3](images/search3.png)
     * 📜 歷史紀錄頁：儲存並顯示最近查過的城市
     * > ![history-1](images/history1.png)
     * > ![history-2](images/history2.png)
