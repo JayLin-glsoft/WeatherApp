@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchWeatherDataAPI, fetchWeatherDataAPIByLocation, WeatherDataWithLocation, LocationData } from '../api/weatherAPI';
 import { RootState } from './store';
+import * as Location from 'expo-location';
 
 const HISTORY_KEY = '@weatherHistory';
 
@@ -46,6 +47,34 @@ export const fetchWeatherByHistory = createAsyncThunk<WeatherDataWithLocation, L
         }
     }
 );
+
+// 新增：建立一個 AsyncThunk 來透過 GPS 獲取天氣資料
+export const fetchWeatherByGPS = createAsyncThunk<WeatherDataWithLocation, void, { rejectValue: string }>(
+    'weather/fetchWeatherByGPS',
+    async (_, { rejectWithValue }) => {
+        try {
+            // 1. 請求權限
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                return rejectWithValue('需要定位權限才能查詢當前位置天氣');
+            }
+
+            // 2. 取得當前座標
+            const location = await Location.getCurrentPositionAsync({});
+            const { latitude, longitude } = location.coords;
+
+            // 3. 透過座標查詢天氣
+            const data = await fetchWeatherDataAPIByLocation({
+                coord: { lat: latitude, lon: longitude },
+                name: '當前位置' 
+            });
+            return data;
+        } catch (error: any) {
+            return rejectWithValue(error.message || '無法取得當前位置天氣');
+        }
+    }
+);
+
 
 // 讀取歷史紀錄
 export const loadHistory = createAsyncThunk<LocationData[]>('weather/loadHistory', async () => {
@@ -105,6 +134,19 @@ const weatherSlice = createSlice({
                 state.weatherData = action.payload;
             })
             .addCase(fetchWeatherByHistory.rejected, (state, action) => {
+                state.loading = 'failed';
+                state.error = action.payload ?? '發生未知錯誤';
+            })
+            .addCase(fetchWeatherByGPS.pending, (state) => {
+                state.loading = 'pending';
+                state.error = null;
+                state.weatherData = null;
+            })
+            .addCase(fetchWeatherByGPS.fulfilled, (state, action: PayloadAction<WeatherDataWithLocation>) => {
+                state.loading = 'succeeded';
+                state.weatherData = action.payload;
+            })
+            .addCase(fetchWeatherByGPS.rejected, (state, action) => {
                 state.loading = 'failed';
                 state.error = action.payload ?? '發生未知錯誤';
             })

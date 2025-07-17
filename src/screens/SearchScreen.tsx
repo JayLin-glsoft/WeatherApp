@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Text, StyleSheet, ActivityIndicator, Pressable, ScrollView } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { fetchWeather, fetchWeatherByHistory, saveHistory } from '../redux/weatherSlice';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { fetchWeather, fetchWeatherByHistory, fetchWeatherByGPS, saveHistory } from '../redux/weatherSlice';
 import { SearchScreenProps } from '../navigation/AppNavigator';
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState, AppDispatch } from '../redux/store';
@@ -24,7 +24,10 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
     const handleSearchAction = (actionCreator: any) => (searchParam: any) => {
         dispatch(actionCreator(searchParam)).then((action: any) => {
             if (action.meta.requestStatus === 'fulfilled') {
-                dispatch(saveHistory(action.payload.location));
+                // 當前位置不存到紀錄裡
+                if (action.payload.location.name !== '當前位置') {
+                    dispatch(saveHistory(action.payload.location));
+                }
             }
         });
     };
@@ -32,6 +35,7 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
     // 使用通用的搜尋處理函數來處理城市搜尋和歷史紀錄搜尋
     const handleSearchByCity = handleSearchAction(fetchWeather);
     const handleSearchByHistory = handleSearchAction(fetchWeatherByHistory);
+    const handleSearchByGPS = handleSearchAction(fetchWeatherByGPS);
 
     // 處理搜尋按鈕點擊事件
     const handleSearch = (searchCity: string) => {
@@ -93,6 +97,9 @@ export default function SearchScreen({ route, navigation }: SearchScreenProps) {
                 />
                 <Pressable style={styles.searchButton} onPress={() => handleSearch(city)}>
                     <Text style={styles.searchButtonText}>搜尋</Text>
+                </Pressable>
+                <Pressable style={styles.iconButton} onPress={handleSearchByGPS}>
+                    <MaterialCommunityIcons name="crosshairs-gps" size={24} color="#007cdb" />
                 </Pressable>
                 <Pressable style={styles.historyContainer}>
                     <MaterialIcons name="history" size={24} color="#007cdb" onPress={handleGotoHistory} />
@@ -205,4 +212,7 @@ const styles = StyleSheet.create({
     historyContainer: {
         paddingLeft: 8,
     },
+    iconButton: {
+        paddingLeft: 8,
+    }
 });
